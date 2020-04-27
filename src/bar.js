@@ -3,16 +3,17 @@ import { $, createSVG, animateSVG } from './svg_utils';
 
 export default class Bar {
     constructor(gantt, task) {
-        this.set_defaults(gantt, task);
+        this.set_defaults(gantt, task, role);
         this.prepare();
         this.draw();
         this.bind();
     }
 
-    set_defaults(gantt, task) {
+    set_defaults(gantt, task, role) {
         this.action_completed = false;
         this.gantt = gantt;
         this.task = task;
+        this.role = role;
     }
 
     prepare() {
@@ -32,8 +33,8 @@ export default class Bar {
         this.width = this.gantt.options.column_width * this.duration;
         this.progress_width =
             this.gantt.options.column_width *
-                this.duration *
-                (this.task.progress / 100) || 0;
+            this.duration *
+            (this.task.progress / 100) || 0;
         this.group = createSVG('g', {
             class: 'bar-wrapper ' + (this.task.custom_class || ''),
             'data-id': this.task.id
@@ -49,19 +50,19 @@ export default class Bar {
     }
 
     prepare_helpers() {
-        SVGElement.prototype.getX = function() {
+        SVGElement.prototype.getX = function () {
             return +this.getAttribute('x');
         };
-        SVGElement.prototype.getY = function() {
+        SVGElement.prototype.getY = function () {
             return +this.getAttribute('y');
         };
-        SVGElement.prototype.getWidth = function() {
+        SVGElement.prototype.getWidth = function () {
             return +this.getAttribute('width');
         };
-        SVGElement.prototype.getHeight = function() {
+        SVGElement.prototype.getHeight = function () {
             return +this.getAttribute('height');
         };
-        SVGElement.prototype.getEndX = function() {
+        SVGElement.prototype.getEndX = function () {
             return this.getX() + this.getWidth();
         };
     }
@@ -122,6 +123,7 @@ export default class Bar {
 
     draw_resize_handles() {
         if (this.invalid) return;
+        if (this.role !== 'admin') return;
 
         const bar = this.$bar;
         const handle_width = 8;
@@ -212,6 +214,8 @@ export default class Bar {
     }
 
     update_bar_position({ x = null, width = null }) {
+        if (this.role !== 'admin') return;
+
         const bar = this.$bar;
         if (x) {
             // get all x values of parent task
@@ -238,6 +242,8 @@ export default class Bar {
     }
 
     date_changed() {
+        if (this.role !== 'admin') return;
+
         let changed = false;
         const { new_start_date, new_end_date } = this.compute_start_end_date();
 
@@ -261,6 +267,8 @@ export default class Bar {
     }
 
     progress_changed() {
+        if (this.role !== 'admin') return;
+
         const new_progress = this.compute_progress();
         this.task.progress = new_progress;
         this.gantt.trigger_event('progress_change', [this.task, new_progress]);
@@ -352,6 +360,8 @@ export default class Bar {
     }
 
     update_attr(element, attr, value) {
+        if (this.role !== 'admin') return;
+
         value = +value;
         if (!isNaN(value)) {
             element.setAttribute(attr, value);
@@ -360,6 +370,8 @@ export default class Bar {
     }
 
     update_progressbar_position() {
+        if (this.role !== 'admin') return;
+
         this.$bar_progress.setAttribute('x', this.$bar.getX());
         this.$bar_progress.setAttribute(
             'width',
@@ -368,6 +380,8 @@ export default class Bar {
     }
 
     update_label_position() {
+        if (this.role !== 'admin') return;
+
         const bar = this.$bar,
             label = this.group.querySelector('.bar-label');
 
@@ -381,6 +395,8 @@ export default class Bar {
     }
 
     update_handle_position() {
+        if (this.role !== 'admin') return;
+
         const bar = this.$bar;
         this.handle_group
             .querySelector('.handle.left')
@@ -394,6 +410,8 @@ export default class Bar {
     }
 
     update_arrow_position() {
+        if (this.role !== 'admin') return;
+
         this.arrows = this.arrows || [];
         for (let arrow of this.arrows) {
             arrow.update();
