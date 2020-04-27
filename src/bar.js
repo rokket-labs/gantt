@@ -2,7 +2,7 @@ import date_utils from './date_utils';
 import { $, createSVG, animateSVG } from './svg_utils';
 
 export default class Bar {
-    constructor(gantt, task) {
+    constructor(gantt, task, role) {
         this.set_defaults(gantt, task, role);
         this.prepare();
         this.draw();
