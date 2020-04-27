@@ -1,5 +1,5 @@
 {
-  "name": "rokket-gantt",
+  "name": "frappe-gantt-with-roles",
   "version": "0.3.1",
   "description": "A simple, modern, interactive gantt library for the web",
   "main": "src/index.js",
